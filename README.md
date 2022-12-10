@@ -3,6 +3,23 @@
 =======
 # flow
 
+## Arch
+
+### Browser plugin
+Has a popup window. Button click triggers 
+- extraction of mp3-file download url
+- triggering conversion endpoint from our server
+- parsing the response to html and inserting it into the pages DOM
+
+### API definition
+#### POST -- /generateblog
+expected body params: 
+- audio_url (str): The download link of the mp3 file
+
+expected returned data:
+- headings (array[str]): An array with the heading of the paragraphs of the blog article
+- paragraphs (array[str]): An array with the body of the paragraphs of the blog article
+
 ## API keys
 
 ### Assembly AI 
