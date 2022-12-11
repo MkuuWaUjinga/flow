@@ -16,7 +16,7 @@ Has a popup window. Button click triggers
 - triggering conversion endpoint from our server
 - parsing the response to html and inserting it into the pages DOM
 
-# Launching Backend
+## Launching Backend
 
 ```bash
 cd backend
@@ -35,6 +35,8 @@ expected returned data:
 
 - headings (array[str]): An array with the heading of the paragraphs of the blog article
 - summaries (array[str]): An array with the body of the paragraphs of the blog article
+
+This will trigger a transcription of the podcast using Assembly's API. The text is then chunked by speaker. Host texts is transformed to headings using Cohere's API. Guest texts are summarized using Cohere's API as well.
 
 ## On the browser
 
