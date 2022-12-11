@@ -1,4 +1,4 @@
-# Flow: Hyper-personalize your content experience.
+# ⚡ Flow: Hyper-personalize your content experience
 
 With Flow, you can consume your favorite content in the form that is right for the moment; Be it audio when you're driving or working out or text when you're short on time.
 
