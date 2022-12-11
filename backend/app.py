@@ -1,10 +1,11 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 import logging
-import numpy as np
-from PIL import Image
+import pickle
+from flask_cors import CORS
 from .assemblyapi import parse_podcast
 from .cohereapi import summarize as cohere_summarize
-from .openaiapi import make_image
+from typing import Dict
 
 logging.basicConfig(
     encoding="utf-8",
@@ -12,6 +13,7 @@ logging.basicConfig(
 )
 
 app = Flask(__name__)
+CORS(app)
 AUDIO_FORMAT = ".mp3"
 
 
@@ -47,7 +49,7 @@ def text() -> str:
 
 
 @app.route("/generateblog", methods=["GET"])
-def summarize() -> str:
+def summarize(use_cache: bool = True) -> Dict:
     """Parse an mp3 uri that's been encoded by encodeURIComponent
 
 
@@ -57,39 +59,32 @@ def summarize() -> str:
         Then in a browser launch
             localhost:5000/generateblog/?uri=https://d3ctxlq1ktw2nl.cloudfront.net/staging/2022-1-23/ebf1141e-02bb-7752-5e74-3aef1d03bbf9.mp3
     Args:
-        uri: .
+        use_cache: .
     Returns:
         Summary of podcast.
 
     """
     # Assumes that the uri is found at /generateblog/uri?=<uri>
-    uri: str = request.args.get("uri")
-    podcast_text = _text(uri)
-    summarized_text = cohere_summarize(podcast_text)[0]
-    return summarized_text
+    if not use_cache:
+        uri: str = request.args.get("uri")
+        podcast_text = _text(uri)
+        summarized_text = cohere_summarize(podcast_text)[0]
+        return summarized_text
 
+    # Cache result for speed
+    with open(
+        "headlines_summaries_c942fd04195599fe23df3b093a8c62ee.mp3.pickle", "rb"
+    ) as f:
+        headlines_and_summaries = pickle.load(f)
 
-@app.route("/hallucinate_podcast", methods=["GET"])
-def hallucinate_podcast() -> np.ndarray:
-    """Parse an mp3 uri that's been encoded by encodeURIComponent into an image.
-
-
-    Example:
-        start server wth:
-            python -m flask run
-        Then in a browser launch
-            localhost:5000/hallucinate/?uri=https://d3ctxlq1ktw2nl.cloudfront.net/staging/2022-1-23/ebf1141e-02bb-7752-5e74-3aef1d03bbf9.mp3
-    Args:
-        uri: .
-    Returns:
-        Image of podcast.
-    """
-    uri: str = request.args.get("uri")
-    podcast_text = _text(uri)
-    summarized_text = cohere_summarize(podcast_text)[0]
-    image: np.ndarray = make_image(summarized_text)
-    Image.fromarray(image).save("./hallucinate.png")
-    return np.ndarray
+    payload = jsonify(
+        {
+            "headlines": headlines_and_summaries[0],
+            "summaries": headlines_and_summaries[1],
+        }
+    )
+    logging.info(payload)
+    return payload
 
 
 if __name__ == "__main__":

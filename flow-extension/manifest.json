@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Tab Manager for Chrome Dev Docs",
+  "name": "Flow",
   "version": "1.0",
   "icons": {
     "16": "images/icon-16.png",
@@ -11,12 +11,18 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "permissions": ["tabs", "<all_urls>", "contextMenus"],
    "content_scripts": [
     {
-      "js": ["popup.js"],
+      "js": ["content.js"],
       "matches": [
         "https://www.lennyspodcast.com/*"
       ]
     }
+  ],
+  "permissions": [
+    // "https://localhost/*",
+    // "http://localhost/*"
+    "<all_urls>"
   ]
 }
